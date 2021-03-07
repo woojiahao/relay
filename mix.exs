@@ -22,7 +22,8 @@ defmodule RelayServer.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:broadway, "~> 0.6.0"}
+      {:broadway, "~> 0.6.0"},
+      {:broadway_rabbitmq, "~> 0.6.0"}
     ]
   end
 end
