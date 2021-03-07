@@ -25,3 +25,5 @@ relay_server-*.tar
 
 # Temporary files for e.g. tests
 /tmp
+
+log/
