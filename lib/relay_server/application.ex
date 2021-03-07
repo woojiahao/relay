@@ -8,8 +8,7 @@ defmodule RelayServer.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: RelayServer.Worker.start_link(arg)
-      # {RelayServer.Worker, arg}
+      {RelayServer.Queue, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
