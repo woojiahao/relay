@@ -8,15 +8,18 @@ back to the client.
 
 The relay server acts as a bank for simple NPCs -- including their names, ages, and favorite foods.
 
+In many ways, it is an upgraded version of the OTP example from the Elixir documentation 
+[here](https://elixir-lang.org/getting-started/mix-otp/genserver.html).
+
 ## Requests
 
 For the sake of simplicity, the relay server will only accept the following requests:
 
-1. `ADD <name> <age> <favorite food>` - creates a new character to add to the bank
-2. `DLT <name>` - deletes a character from the bank
-3. `GET <name>` - retrieves a character from the bank
-4. `ALL` - retrieves all character information from the bank -- intentionally sent as a batch request
-
+1. `add(<name>, <age>, <favorite food>)` - creates a new character to add to the bank
+2. `delete(<name>)` - deletes a character from the bank
+3. `get(<name>)` - retrieves a character from the bank
+4. `get_all()` - retrieves all character information from the bank -- intentionally sent as a batch request
+5. `update(<name>, age: <age>, favorite_food: <favorite food>)` - update a character
 
 ## Usage
 
@@ -36,21 +39,18 @@ cd relay/
 mix deps.get
 ```
 
-Run the project. This starts the server automatically. Clients have to be created manually.
+Run the project. This starts the server and client simultaneously.
 
 ```bash
 iex -S mix
 ```
 
-Create a new client connection and start making requests.
-
 ```elixir
-client = RelayServer.Client.new
-{ :ok, john } = client.add("John Doe", 27, "Pasta")
-{ :ok, mary } = client.add("Mary Anne", 19, "Pepperoni Pizza")
-characters = client.get_all()
+{ :ok, john } = RelayServer.Client.add("John Doe", 27, "Pasta")
+{ :ok, mary } = RelayServer.Client.add("Mary Anne", 19, "Pepperoni Pizza")
+characters = RelayServer.Client.get_all()
 IO.puts(inspect(characters))
-:ok = client.delete("Mary Anne")
-characters = client.get_all()
+:ok = RelayServer.Client.delete("Mary Anne")
+characters = RelayServer.Client.get_all()
 IO.puts(inspect(characters))
 ```
