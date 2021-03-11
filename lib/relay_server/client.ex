@@ -2,65 +2,33 @@ defmodule RelayServer.Client do
   @moduledoc """
   Client for the relay server
   """
-  use GenServer
 
-  def add(server, name, age, favorite_food) do
-    GenServer.cast(server, {:add, name, age, favorite_food})
+  def child_spec(_) do
+    %{
+      id: __MODULE__,
+      start: {__MODULE__, :start_link, []},
+      type: :worker
+    }
   end
 
-  def delete(server, name) do
-    GenServer.cast(server, {:delete, name})
+  def start_link() do
+    IO.puts("Starting client...")
+    {:ok, self()}
   end
 
-  def get_all(server) do
-    GenServer.call(server, :get_all)
+  def add(name, age, favorite_food) do
+    GenServer.cast(Server, {:add, name, age, favorite_food})
   end
 
-  def get(server, name) do
-    GenServer.call(server, {:get, name})
+  def delete(name) do
+    GenServer.cast(Server, {:delete, name})
   end
 
-  @impl true
-  def init(:ok) do
-    {:ok, []}
+  def get_all() do
+    GenServer.call(Server, :get_all)
   end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
-  end
-
-  @impl true
-  def handle_call({:get, name}, _from, characters) do
-    matching_character =
-      characters
-      |> Enum.filter(&(&1.name == name))
-      |> List.first()
-
-    {:reply, matching_character, characters}
-  end
-
-  @impl true
-  def handle_call(:get_all, _from, characters) do
-    {:reply, characters, characters}
-  end
-
-  @impl true
-  def handle_cast({:delete, name}, characters) do
-    matching_character_index =
-      characters
-      |> Enum.find_index(&(&1.name == name))
-
-    if not is_nil(matching_character_index) do
-      {:noreply, characters |> List.delete_at(matching_character_index)}
-    else
-      {:noreply, characters}
-    end
-  end
-
-  @impl true
-  def handle_cast({:add, name, age, favorite_food}, characters) do
-    new_character = %RelayServer.Character{name: name, age: age, favorite_food: favorite_food}
-    characters = [new_character | characters]
-    {:noreply, characters}
+  def get(name) do
+    GenServer.call(Server, {:get, name})
   end
 end

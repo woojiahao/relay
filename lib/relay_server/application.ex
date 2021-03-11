@@ -6,8 +6,9 @@ defmodule RelayServer.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      {RelayServer.Queue, name: Relay.Queue},
-      {RelayServer.Client, name: Relay.Client}
+      {RelayServer.Queue, name: Queue},
+      {RelayServer.Server, name: Server},
+      {RelayServer.Client, name: Client}
     ]
 
     opts = [strategy: :one_for_one, name: RelayServer.Supervisor]
