@@ -23,7 +23,8 @@ defmodule RelayServer.MixProject do
   defp deps do
     [
       {:broadway, "~> 0.6.0"},
-      {:broadway_rabbitmq, "~> 0.6.0"}
+      {:broadway_rabbitmq, "~> 0.6.0"},
+      {:jason, "~> 1.2"}
     ]
   end
 end
