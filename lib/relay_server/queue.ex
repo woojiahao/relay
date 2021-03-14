@@ -1,7 +1,11 @@
 defmodule RelayServer.Queue do
   use Broadway
 
-  alias Broadway.Message
+  alias Broadway.Message, warn: false
+
+  require Logger
+
+  @server_proc Server
 
   def start_link(_opts) do
     IO.puts("Starting queue manager...")
@@ -11,7 +15,7 @@ defmodule RelayServer.Queue do
       producer: [
         module: {
           BroadwayRabbitMQ.Producer,
-          queue: "relay_server_queue", qos: [prefetch_count: 1]
+          queue: "relay_server_queue", qos: [prefetch_count: 50]
         }
       ],
       processors: [
@@ -31,14 +35,48 @@ defmodule RelayServer.Queue do
 
   @impl true
   def handle_message(_, message, _) do
+    process_message(message)
     message
-    |> Message.update_data(fn data -> {data, String.to_integer(data) * 2} end)
   end
 
   @impl true
   def handle_batch(_, messages, _, _) do
-    list = messages |> Enum.map(& &1.data)
-    IO.inspect(list, label: "Got batch")
     messages
+  end
+
+  @spec process_message(Message.t()) :: any()
+  defp process_message(message) do
+    payload = Jason.decode!(message.data)
+    action = payload["action"] |> String.to_atom()
+
+    case action do
+      :GETA ->
+        characters = GenServer.call(@server_proc, :get_all)
+        characters |> Enum.each(&IO.puts(IO.inspect(&1)))
+
+      :GET ->
+        name = payload["name"]
+        character = GenServer.call(@server_proc, {:get, name})
+        IO.puts(IO.inspect(character))
+
+      :ADD ->
+        %{
+          "name" => name,
+          "age" => age,
+          "favorite_food" => favorite_food
+        } = payload
+
+        GenServer.cast(@server_proc, {:add, name, age, favorite_food})
+
+        IO.puts("Created character #{name}")
+
+      :DELETE ->
+        name = payload["name"]
+        GenServer.cast(@server_proc, {:delete, name})
+        IO.puts("Deleted character #{name}")
+
+      _ ->
+        Logger.error("Invalid action type.")
+    end
   end
 end
