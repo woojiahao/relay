@@ -46,11 +46,11 @@ iex -S mix
 ```
 
 ```elixir
-{ :ok, john } = RelayServer.Client.add("John Doe", 27, "Pasta")
-{ :ok, mary } = RelayServer.Client.add("Mary Anne", 19, "Pepperoni Pizza")
+RelayServer.Client.add("John Doe", 27, "Pasta")
+RelayServer.Client.add("Mary Anne", 19, "Pepperoni Pizza")
 characters = RelayServer.Client.get_all()
-IO.puts(inspect(characters))
-:ok = RelayServer.Client.delete("Mary Anne")
+IO.puts(IO.inspect(characters))
+RelayServer.Client.delete("Mary Anne")
 characters = RelayServer.Client.get_all()
-IO.puts(inspect(characters))
+IO.puts(IO.inspect(characters))
 ```
