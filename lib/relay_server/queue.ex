@@ -10,6 +10,14 @@ defmodule RelayServer.Queue do
   def start_link(_opts) do
     IO.puts("Starting queue manager...")
 
+    :ok =
+      :telemetry.attach(
+        "handle-message-handler",
+        [:broadway, :processor, :stop],
+        &RelayServer.Handler.handle_event/4,
+        nil
+      )
+
     Broadway.start_link(__MODULE__,
       name: RelayServer.Queue,
       producer: [
